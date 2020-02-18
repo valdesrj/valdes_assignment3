@@ -2,9 +2,10 @@
 // Using Computer-Assisted Instruction (CAI) help elementary school
 // students learn multiplication.
 //
-// CAI1 produces two random, positive one-digit integers; checks the
-// students answer of the multiplication and either terminates the program
-// with a correct response or repeatedly asks the same question.
+// This CAI produces two random, positive one-digit integers; checks the
+// student's answer of the multiplication question and either terminates the 
+// program for a correct response or repeatedly asks the same question for
+// an incorrect response.
 
 import java.security.SecureRandom;
 import java.util.Scanner;
@@ -15,6 +16,11 @@ public class CAI1 {
 	
     // input object will get input from the console
  	private static Scanner input = new Scanner(System.in);
+ 	
+ 	// class fields
+ 	private static int num1;
+ 	private static int num2;
+ 	private static int answer;
  
 	public static void main(String[] args)
 	{
@@ -24,38 +30,44 @@ public class CAI1 {
 	
 	// the program logic
 	public static void quiz() {
-		// generate random numbers from 0 to 9 inclusive
-	    int a = randomNumbers.nextInt(10);
-	    int b = randomNumbers.nextInt(10);
+        // generate two random, positive one-digit integers from 0 to 9 inclusive
+		num1 = generateRands(10);
+		num2 = generateRands(10);
 	    
-	    // prompt the user with the multiplication question
-	    askQuestion(a, b);
+	    // prompt the user with the question
+	    askQuestion();
 	    	    
 		// continue asking the user until the correct response is provided
-	    while (!isAnswerCorrect(a, b, readResponse())) {
+	    while (!isAnswerCorrect(readResponse())) {
 	    	System.out.printf("%s", displayIncorrectResponse());
-	    	askQuestion(a,b);
+	    	askQuestion();
 	    }
 		
-	    // correct answer was provided and program terminates
+	    // correct response was provided and program terminates
 	    System.out.printf("%s", displayCorrectResponse());
 	}
 	
+	// generates a random number from 0 to range-1 inclusive
+	public static int generateRands(int range) {
+		return randomNumbers.nextInt(range);
+	}
+	
 	// prints the problem to the screen
-	public static void askQuestion(int a, int b) {
-		System.out.printf("How much is %d times %d? ", a, b);
+	public static void askQuestion() {
+		System.out.printf("How much is %d times %d? ", num1, num2);
 	}
 	
 	// reads the answer from the student
 	public static int readResponse() {
-		int answer = input.nextInt();
+		answer = input.nextInt();
 		input.nextLine();
 		return answer;
 	}
 	
-	// checks the student answer to the correct answer
-	public static boolean isAnswerCorrect(int a, int b, int answer) {
-		return a * b == answer;
+	// compares the student answer to the correct answer and returns
+	// 0 for false and 1 for true
+	public static boolean isAnswerCorrect(int answer) {
+		return num1 * num2 == answer;
 	}
 	
 	// prints the response when a student enters the correct answer
