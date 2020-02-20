@@ -23,8 +23,9 @@ public class CAI3 {
     private static Scanner input = new Scanner(System.in);
     
     // class fields
-  	private static ArrayList<Integer> num1 = new ArrayList<Integer>();
-  	private static ArrayList<Integer> num2 = new ArrayList<Integer>();
+  	private static int num1;
+  	private static int num2;
+  	private static int rangeRands = 10;
   	private static int answer;
   	private static int totalQuestions = 10;
   	private static int currentQuestion = 0;
@@ -39,17 +40,16 @@ public class CAI3 {
 	
 	// the program logic
     public static void quiz() {
-    	// repeat the set of numQuestions as long as students are interested
+    	// repeat the set of totalQuestions as long as students are interested
     	do {
-    		// ask numQuestions number of different questions
-    		System.out.println("Please answer the following questions:");
-    		askQuestion();
-    		
-    		for (int i = 0; i < 10; i++)
+    		// ask totalQuestions number of different questions  		
+    		for (int i = 0; i < totalQuestions; i++)
     		{
+    			currentQuestion++;
+    			askQuestion();
+    			
 			    // check if response was correct or incorrect and increase the
 			    // appropriate counter
-    			System.out.printf("%nAnswer %d. is ", currentQuestion + 1);
 			    if (isAnswerCorrect(readResponse()))
 			    {
 			    	// correct answer was provided: display random response
@@ -64,7 +64,6 @@ public class CAI3 {
 			    	System.out.printf("%s", displayIncorrectResponse());
 			    	incorrect++;
 			    }
-			    currentQuestion++; // go to next question in ArrayList
     		}
     		// display the percent correct and appropriate response
     		displayCompletionMessage();
@@ -87,9 +86,6 @@ public class CAI3 {
         		percCorrect, "%", 
         		"Congratulations, you are ready to go to the next level!");
     	}
-    	correct = 0;
-    	incorrect = 0;
-    	currentQuestion = 0;
     }
     
     // prompts the user whether they would like to continue or exit the quiz
@@ -98,7 +94,10 @@ public class CAI3 {
     		"Would you like to continue with a new problem set? (y/n) ");
     	String res = input.nextLine();
     	if (res.toLowerCase().equals("y")) 
-    	{    		
+    	{
+    		correct = 0;
+        	incorrect = 0;
+        	currentQuestion = 0;
     		return true;
     	}
     	else
@@ -114,15 +113,12 @@ public class CAI3 {
 	
 	// prints the problem(s) to the screen
     public static void askQuestion() {
-    	for (int i = 0; i < totalQuestions; i++)
-    	{
-    		// generate two random, positive one-digit integers from 0 to 9
-			// inclusive
-	    	num1.add(generateRands(10));
-	    	num2.add(generateRands(10));
-    		System.out.printf("%d. How much is %d times %d?%n", i+1, 
-    			num1.get(i), num2.get(i));
-    	}
+    	// generate two random, positive one-digit integers from 0 to 9
+		// inclusive
+	    num1 = generateRands(rangeRands);
+	    num2 = generateRands(rangeRands);
+    	System.out.printf("%d. How much is %d times %d? ", currentQuestion,
+    			num1, num2);
 	}
 	
 	// reads the answer from the student
@@ -140,7 +136,7 @@ public class CAI3 {
 	// compares the student answer to the correct answer and returns
 	// 0 for false and 1 for true
     public static boolean isAnswerCorrect(int answer) {
-		return num1.get(currentQuestion) * num2.get(currentQuestion) == answer;
+		return num1 * num2 == answer;
 	}
 	
 	// prints one of four responses when a student enters the correct answer
