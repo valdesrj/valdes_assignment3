@@ -21,29 +21,28 @@ public class CAI2 {
     private static Scanner input = new Scanner(System.in);
     
     // class fields
-  	private static int num1;
-  	private static int num2;
-  	private static int answer;
+    private int totalQuestions = 10;
  
     public static void main(String[] args)
 	{
 	    // start the quiz
-		quiz();
+		CAI2 q = new CAI2();
+    	q.quiz();
 	}
 	
 	// the program logic
-    public static void quiz() {
+    public void quiz() {
 		// generate two random, positive one-digit integers from 0 to 9 inclusive
-    	num1 = generateRands(10);
-    	num2 = generateRands(10);
+    	int num1 = generateRands(totalQuestions);
+    	int num2 = generateRands(totalQuestions);
 	    
 	    // prompt the user with the question
-	    askQuestion();
+	    askQuestion(num1, num2);
 	    	    
 		// continue asking the user until the correct response is provided
-	    while (!isAnswerCorrect(readResponse())) {
+	    while (!isAnswerCorrect(num1, num2, readResponse())) {
 	    	System.out.printf("%s", displayIncorrectResponse());
-	    	askQuestion();
+	    	askQuestion(num1, num2);
 	    }
 		
 	    // correct answer was provided and program terminates
@@ -56,20 +55,20 @@ public class CAI2 {
 	}
 	
 	// prints the problem to the screen
-    public static void askQuestion() {
+    public void askQuestion(int num1, int num2) {
 		System.out.printf("How much is %d times %d? ", num1, num2);
 	}
 	
 	// reads the answer from the student
-    public static int readResponse() {
-		answer = input.nextInt();
+    public int readResponse() {
+		int answer = input.nextInt();
 		input.nextLine();
 		return answer;
 	}
 	
 	// compares the student answer to the correct answer and returns
 	// 0 for false and 1 for true
-    public static boolean isAnswerCorrect(int answer) {
+    public boolean isAnswerCorrect(int num1, int num2, int answer) {
 		return num1 * num2 == answer;
 	}
 	
@@ -92,7 +91,7 @@ public class CAI2 {
 	}
 	
 	// prints one of four responses when a student enters an incorrect answer
-    public static String displayIncorrectResponse() {
+    public String displayIncorrectResponse() {
 		// generate random numbers from 0 to 3 inclusive to represent the
 		// response, offset by 1 and select the appropriate response
 	    switch(1 + generateRands(4)) {

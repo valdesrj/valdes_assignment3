@@ -22,34 +22,38 @@ public class CAI3 {
     private static Scanner input = new Scanner(System.in);
     
     // class fields
-  	private static int num1;
-  	private static int num2;
-  	private static int rangeRands = 10;
-  	private static int answer;
-  	private static int totalQuestions = 10;
-  	private static int currentQuestion = 0;
-  	private static int correct = 0;
-  	private static int incorrect = 0;
+  	private int rangeRands = 10;
+  	private int totalQuestions = 10;
  
     public static void main(String[] args)
 	{
 	    // start the quiz
-		quiz();
+    	CAI3 q = new CAI3();
+		q.quiz();
 	}
 	
 	// the program logic
-    public static void quiz() {
+    public void quiz() {
     	// repeat the set of totalQuestions as long as students are interested
     	do {
+    		// initialize the variables
+    		int correct = 0;
+        	int incorrect = 0;
+        	int currentQuestion = 0;
+    		
     		// ask totalQuestions number of different questions  		
     		for (int i = 0; i < totalQuestions; i++)
     		{
     			currentQuestion++;
-    			askQuestion();
+    			
+    			// generate two random, positive integers from 0 to 9 inclusive
+    		    int num1 = generateRands(rangeRands);
+    		    int num2 = generateRands(rangeRands);
+    			askQuestion(currentQuestion, num1, num2);
     			
 			    // check if response was correct or incorrect and increase the
 			    // appropriate counter
-			    if (isAnswerCorrect(readResponse()))
+			    if (isAnswerCorrect(num1, num2, readResponse()))
 			    {
 			    	// correct answer was provided: display random response
 			    	// and increment counter correct
@@ -65,14 +69,14 @@ public class CAI3 {
 			    }
     		}
     		// display the percent correct and appropriate response
-    		displayCompletionMessage();
+    		displayCompletionMessage(correct, incorrect);
     	// ask user for another go
     	} while (resetQuiz());
 	}
     
     // displays the completion message of the student's score and appropriate
     // response
-    public static void displayCompletionMessage() {
+    public void displayCompletionMessage(int correct, int incorrect) {
     	double percCorrect = (double) correct / (correct +  incorrect) * 100.;
     	if (percCorrect < 75.0 )
     	{
@@ -88,15 +92,12 @@ public class CAI3 {
     }
     
     // prompts the user whether they would like to continue or exit the quiz
-    public static boolean resetQuiz() {
+    public boolean resetQuiz() {
     	System.out.printf("%n%n%s", 
     		"Would you like to continue with a new problem set? (y/n) ");
     	String res = input.nextLine();
     	if (res.toLowerCase().equals("y")) 
     	{
-    		correct = 0;
-        	incorrect = 0;
-        	currentQuestion = 0;
     		return true;
     	}
     	else
@@ -106,22 +107,22 @@ public class CAI3 {
     }
     
     // generates a random number from 0 to range-1 inclusive
-	public static int generateRands(int range) {
+	public int generateRands(int range) {
 		return randomNumbers.nextInt(range);
 	}
 	
 	// prints the problem(s) to the screen
-    public static void askQuestion() {
+    public void askQuestion(int currentQuestion, int num1, int num2) {
     	// generate two random, positive one-digit integers from 0 to 9
 		// inclusive
-	    num1 = generateRands(rangeRands);
-	    num2 = generateRands(rangeRands);
+
     	System.out.printf("%d. How much is %d times %d? ", currentQuestion,
     			num1, num2);
 	}
 	
 	// reads the answer from the student
-    public static int readResponse() {
+    public int readResponse() {
+    	int answer = 0;
     	try {
 		    answer = input.nextInt();
     	}
@@ -134,12 +135,12 @@ public class CAI3 {
 	
 	// compares the student answer to the correct answer and returns
 	// 0 for false and 1 for true
-    public static boolean isAnswerCorrect(int answer) {
+    public boolean isAnswerCorrect(int num1, int num2, int answer) {
 		return num1 * num2 == answer;
 	}
 	
 	// prints one of four responses when a student enters the correct answer
-    public static String displayCorrectResponse() {
+    public String displayCorrectResponse() {
 		// generate random numbers from 0 to 3 inclusive to represent the
 		// response, offset by 1 and select the appropriate response
 	    switch(1 + generateRands(4)) {
@@ -157,7 +158,7 @@ public class CAI3 {
 	}
 	
 	// prints one of four responses when a student enters an incorrect answer
-    public static String displayIncorrectResponse() {
+    public String displayIncorrectResponse() {
 		// generate random numbers from 0 to 3 inclusive to represent the
 		// response, offset by 1 and select the appropriate response
 	    switch(1 + generateRands(4)) {

@@ -24,45 +24,57 @@ public class CAI5 {
     private static Scanner input = new Scanner(System.in);
     
     // class fields
-    private static int correct = 0;
-    private static int currentQuestion = 0;
-    private static int incorrect = 0;
-  	private static double num1;
-  	private static double num2;
-  	private static int rangeRands;
-  	private static int totalQuestions = 10;
-  	private static int difficulty;
-  	private static int problemType;
-  	private static char mathSymbol;
-  	private static boolean mixMaths;
+  	private int totalQuestions = 10;
+  	private boolean mixMaths = false; // variable to check for random problems
  
     public static void main(String[] args)
 	{
 	    // start the quiz
-		quiz();
+    	CAI5 q = new CAI5();
+		q.quiz();
 	}
 	
 	// the program logic
-    public static void quiz() {
+    public void quiz() {
     	// repeat the set of totalQuestions as long as students are interested
     	do {
+    		// initialize the variables
+    		int correct = 0;
+        	int incorrect = 0;
+        	int currentQuestion = 0;
+    		
     		// ask the student for the difficulty level of the current quiz
-			readDifficulty();
+			int difficulty = readDifficulty();
 			
 			// ask the student for the type of arithmetic problem to study
-			readProblemType();
+			int problemType = readProblemType();
     		
     		// loop for totalQuestions times  		
     		for (int i = 0; i < totalQuestions; i++)
     		{
     			currentQuestion++;
     			
+    			// generate random, positive integer based on difficulty
+    		    int num1 = randomNumbers.nextInt(
+    		    	           generateQuestionArgument(difficulty));
+    		    
+    		    // generate random positive integer based on difficulty & if the 
+    		    // problem type is division, generate a random positive
+    		    // non-zero integer
+    		    int num2;
+    		    do {
+    		    	num2 = randomNumbers.nextInt(
+    		    		       generateQuestionArgument(difficulty));
+    		    } while (problemType == 4 && num2 == 0);
+    		        			
     			// ask the student the mathematics question
-    			askQuestion();
+    		    // the problem type will be randomly reset if problem type = 5
+    			problemType = askQuestion(currentQuestion, num1, num2, 
+    					          problemType);
     			
 			    // check if response was correct or incorrect and increase the
 			    // appropriate counter
-			    if (isAnswerCorrect(readResponse()))
+			    if (isAnswerCorrect(num1, num2, readResponse(), problemType))
 			    {
 			    	// correct answer was provided: display random response
 			    	// and increment counter correct
@@ -78,16 +90,16 @@ public class CAI5 {
 			    }
     		}
     		// display the percent correct and appropriate response
-    		displayCompletionMessage();
+    		displayCompletionMessage(correct, incorrect);
     	// ask student for another go
     	} while (resetQuiz());
 	}
     
-    // read the problem type: 1 for addition, 2 for subtraction,
-    // 3 for multiplication, 4 for division, and 5 for a random mixture.
+    // read the problem type: 1 for addition, 2 for multiplication,
+    // 3 for subtraction, 4 for division, and 5 for a random mixture.
     // convert input to operator
-    public static void readProblemType() {
-    	problemType = 2;
+    public int readProblemType() {
+    	int problemType = 2;
     	System.out.println("\nArithmetic Problem Type:");
     	System.out.println("1. Addition");
     	System.out.println("2. Multiplication");
@@ -96,7 +108,8 @@ public class CAI5 {
     	System.out.println("5. Random Mixture of Arithmetic");
     	try {   		
 	    	do {
-	    		System.out.printf("Please enter a problem type (1, 2, 3, 4, or 5): ");
+	    		System.out.printf(
+	    			"Please enter a problem type (1, 2, 3, 4, or 5): ");
 	    		problemType = input.nextInt();
 	    	} while (problemType > 5 || problemType < 1);
     	}
@@ -112,12 +125,14 @@ public class CAI5 {
     	{
     		mixMaths = true;
     	}
+    	
+    	return problemType;
     }
     
     // read the difficulty level from the student as an integer 1, 2, 3, or 4
     // convert input to range of 0-9, 0-99, 0-999, or 0-9999, respectively
-    public static void readDifficulty() {
-    	difficulty = 1;
+    public int readDifficulty() {
+    	int difficulty = 1;
     	System.out.println("Difficulty Levels:");
     	System.out.println("1. Numbers in range 0-9");
     	System.out.println("2. Numbers in range 0-99");
@@ -125,7 +140,8 @@ public class CAI5 {
     	System.out.println("4. Numbers in range 0-9999");
     	try {
 	    	do {
-	    		System.out.printf("Please enter a diffuculty level (1, 2, 3, or 4): ");
+	    		System.out.printf(
+	    			"Please enter a diffuculty level (1, 2, 3, or 4): ");
 	    		difficulty = input.nextInt();
 	    	} while (difficulty > 4 || difficulty < 1);
     	}
@@ -134,12 +150,13 @@ public class CAI5 {
     		System.out.println("Difficulty Level set to 1.");
     	}
     	input.nextLine();
+    	return difficulty;
     }
     
     
     // displays the completion message of the student's score and appropriate
     // response
-    public static void displayCompletionMessage() {
+    public void displayCompletionMessage(int correct, int incorrect) {
     	double percCorrect = (double) correct / (correct +  incorrect) * 100.;
     	if (percCorrect < 75.0 )
     	{
@@ -155,15 +172,12 @@ public class CAI5 {
     }
     
     // prompts the student whether they would like to continue or exit the quiz
-    public static boolean resetQuiz() {
+    public boolean resetQuiz() {
     	System.out.printf("%n%n%s", 
     		"Would you like to continue with a new problem set? (y/n) ");
     	String res = input.nextLine();
     	if (res.toLowerCase().equals("y")) 
     	{
-    		correct = 0;
-        	incorrect = 0;
-        	currentQuestion = 0;
     		return true;
     	}
     	else
@@ -172,38 +186,35 @@ public class CAI5 {
     	}
     }
     
-    // generates a random number from 0 to rangeRands inclusive
-	public static double generateQuestionArgument() {
+    // generates the argument based on the difficulty level
+	public int generateQuestionArgument(int difficulty) {
 		// set the random number range
     	switch(difficulty) {
     	    case 1:
-    	    	rangeRands = 9;
-    	    	break;
+    	    	return 9;
     	    case 2:
-    	    	rangeRands = 99;
-    	    	break;
+    	    	return 99;
     	    case 3:
-    	    	rangeRands = 999;
-    	    	break;
+    	    	return 999;
     	    case 4:
-    	    	rangeRands = 9999;
-    	    	break;
+    	    	return 9999;
     	    default:
-    	    	rangeRands = 9;
+    	    	return 9;
     	}
-		return randomNumbers.nextInt(rangeRands + 1);
 	}
 	
-	// prints the problem to the screen
-    public static void askQuestion() {
+	// prints the problem to the screen based on problem type
+    public int askQuestion(int currentQuestion, int num1, int num2,
+    	int problemType) {
     	// if problemType is a random mixture, generate a random arithmetic
-    	// problem
+    	// problem and reset the problem type
     	if (mixMaths)
     	{
     		problemType = 1 + randomNumbers.nextInt(4);
     	}
     	
     	// set the problem type arithmetic symbol
+    	char mathSymbol;
     	switch(problemType) {
 		    case 1:
 		    	mathSymbol = '+';
@@ -220,22 +231,16 @@ public class CAI5 {
 		    default:
 		    	mathSymbol = '*';
 		}
-    	
-    	// generate a random, positive integer
-	    num1 = generateQuestionArgument();
-	    
-	    // if the problem type is division, generate a random positive
-	    // non-zero integer
-	    do {
-	    	num2 = generateQuestionArgument(); 	
-	    } while (problemType == 4 && num2 == 0);
-	    
-    	System.out.printf("%d. How much is %.0f %c %.0f? ", currentQuestion,
+
+    	System.out.printf("%d. How much is %d %c %d? ", currentQuestion,
     		               num1, mathSymbol, num2);
+    	
+    	// return the problem type
+    	return problemType;
 	}
 	
 	// reads the answer from the student
-    public static double readResponse() {
+    public double readResponse() {
     	double answer = 0;
     	try {
 		    answer = input.nextDouble();
@@ -249,7 +254,8 @@ public class CAI5 {
 	
 	// compares the student answer to the correct answer and returns
 	// 0 for false and 1 for true
-    public static boolean isAnswerCorrect(double answer) {
+    public boolean isAnswerCorrect(int num1, int num2, double answer,
+    	int problemType) {
     	double eps = 0.000001;
     	switch (problemType)
     	{
@@ -260,14 +266,14 @@ public class CAI5 {
     	    case 3:
     	    	return Math.abs(num1 - num2 - answer) < eps;
     	    case 4:
-    	    	return Math.abs(num1 / num2 - answer) < eps;
+    	    	return Math.abs((double) num1 / num2 - answer) < eps;
     	    default:
     	    	return Math.abs(num1 * num2 - answer) < eps;
     	}
 	}
 	
 	// prints one of four responses when a student enters the correct answer
-    public static String displayCorrectResponse() {
+    public String displayCorrectResponse() {
 		// generate random numbers from 0 to 3 inclusive to represent the
 		// response, offset by 1 and select the appropriate response
 	    switch(1 + randomNumbers.nextInt(4)) {
@@ -285,7 +291,7 @@ public class CAI5 {
 	}
 	
 	// prints one of four responses when a student enters an incorrect answer
-    public static String displayIncorrectResponse() {
+    public String displayIncorrectResponse() {
 		// generate random numbers from 0 to 3 inclusive to represent the
 		// response, offset by 1 and select the appropriate response
 	    switch(1 + randomNumbers.nextInt(4)) {
