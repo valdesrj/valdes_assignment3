@@ -11,7 +11,6 @@
 // message. The CAI then resets so another student can try the questions.
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
